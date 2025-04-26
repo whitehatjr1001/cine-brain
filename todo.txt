@@ -1,0 +1,41 @@
+# CineBrain Sprint Plan - todo.txt
+
+## Day 1: Core Setup & Config
+- [x] Create/verify src/config/settings.py with env loader
+- [x] Setup logging module in src/config/logger.py
+- [x] Add/Update .gitignore (exclude __pycache__, .env)
+- [x] Update pyproject.toml scripts section
+
+## Day 2: LLM Wrappers & Prompts
+- [x] Scaffold src/integrations/llm_wrappers.py with call_llm function done this in hellper utils
+- [x] Ensure src/prompts.py is populated (naive prompts)
+- [ ] Write simple tests for wrapper & prompt formatting
+
+## Day 3: Agent Stubs (Text)
+- [ ] Create src/agents/idea_generator.py stub
+- [ ] Create src/agents/dialogue_writer.py stub
+- [ ] Create src/agents/plot_consistency.py stub
+- [ ] Create src/agents/vibe_matcher.py stub
+- [ ] Create src/agents/box_office_predictor.py stub
+- [ ] Unit-test each agent stub
+
+## Day 4: Media Integrations
+- [ ] Integrate TTS service in src/integrations/tts_service.py
+- [ ] Integrate Image API in src/integrations/image_api.py
+- [ ] Write example scripts generating an MP3 and an image file
+
+## Day 5: Router Skeleton
+- [ ] Build src/agent_graph/router.py using ROUTER_PROMPT
+- [ ] Parse LLM JSON output to dict with thought_process, action, response
+- [ ] Unit-test router with sample chat histories
+
+## Day 6: LangGraph Nodes & Edges
+- [ ] Define nodes and edges in src/agent_graph/graph.py
+- [ ] Register router node and two agent nodes (idea & dialogue)
+- [ ] Write run_graph.py orchestrator script
+
+## Day 7: Testing & Deployment
+- [ ] Write integration tests for full workflows
+- [ ] Create Dockerfile and docker-compose.yml
+- [ ] Build and smoke-test Docker container locally
+- [ ] Sprint Review & Retrospective
