@@ -9,7 +9,7 @@
 ## Day 2: LLM Wrappers & Prompts
 - [x] Scaffold src/integrations/llm_wrappers.py with call_llm function done this in hellper utils
 - [x] Ensure src/prompts.py is populated (naive prompts)
-- [ ] Write simple tests for wrapper & prompt formatting
+- [x] Write simple tests for wrapper & prompt formatting
 
 ## Day 3: Agent Stubs (Text)
 - [ ] Create src/agents/idea_generator.py stub

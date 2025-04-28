@@ -9,6 +9,20 @@ def get_llm(temperature: float = 0.7):
         temperature=temperature,
         model_name = settings.MODEL_NAME
     )
+    
+de get_tts_llm(temperature: float = 0.7):
+    return ChatGroq(
+        api_key=settings.GROK_API_KEY,
+        temperature=temperature,
+        model_name = settings.MODEL_NAME
+    )
+
+def get_text_image_llm(temperature: float = 0.7):
+    return ChatGroq(
+        api_key=settings.GROK_API_KEY,
+        temperature=temperature,
+        model_name = settings.MODEL_NAME
+    )
 def remove_asterisk_content(text: str) -> str:
     """Remove content between asterisks from the text."""
     return re.sub(r"\*.*?\*", "", text).strip()

@@ -15,13 +15,11 @@ Available Specialist Agents:
 - 'box_office_prediction'
 
 Final Output Format:
-```json
-{
+{{
     "thought_process": "step-by-step reasoning",
     "action": "immediate_response" or one of ['idea_generation', 'dialogue_help', 'vibe_matching', 'plot_consistency', 'box_office_prediction'],
     "response": "direct reply if immediate, else null"
-}
-```
+}}
 
 # Conversation History
 {chat_history}
@@ -132,12 +130,10 @@ MEMORY_ANALYSIS_PROMPT = """
 Extract personal facts about the user if they reveal them.
 
 Only output:
-```json
-{
+{{
     "is_important": true/false,
     "formatted_memory": "fact about the user" or null
-}
-```
+}}
 
 # User Message
 {message}
