@@ -13,6 +13,7 @@
 
 ## Day 3: Agent Stubs (Text)
 - [ ] Create src/agents/idea_generator.py stub
+- [ ] Complete memory module add in memory short term and a long term memory
 - [ ] Create src/agents/dialogue_writer.py stub
 - [ ] Create src/agents/plot_consistency.py stub
 - [ ] Create src/agents/vibe_matcher.py stub
