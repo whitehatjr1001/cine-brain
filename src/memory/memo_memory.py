@@ -1,55 +1,59 @@
 from __future__ import annotations
-import os
 import asyncio
 from pydantic import BaseModel
 from src.config.settings import settings
-try:
-    from mem0 import AsyncMemoryClient
-except ImportError:
-    raise ImportError("mem0 is not installed. Please install it using 'pip install mem0ai'.")
-from langraph.tools import tool
 
-class Mem0Context(BaseModel):
-    user_id: str | None = None
+# Mem0 client
+from mem0 import AsyncMemoryClient
+
+# LangGraph tool decorator & config
+from langchain_core.tools import tool
+from langchain_core.runnables import RunnableConfig
 
 client = AsyncMemoryClient(api_key=settings.MEMO_API_KEY)
 
-class RunContextWrapper:
-    def __init__(self, context):
-        self.context = context
+class Mem0Config(BaseModel):
+    """Schema for configurable runtime data."""
+    user_id: str | None = None
 
 @tool
-async def add_to_memory(context: RunContextWrapper[Mem0Context], content: str) -> str:
+async def add_to_memory(
+    content: str,
+    config: RunnableConfig
+) -> str:
     """
-    Add a message to Mem0
-    Args:
-        content: The content to store in memory.
+    Store a piece of content in Mem0 under the given user_id.
     """
+    user_id = config["configurable"].get("user_id") or "default_user"
     messages = [{"role": "user", "content": content}]
-    user_id = context.context.user_id or "default_user"
     await client.add(messages, user_id=user_id)
-    return f"Stored message: {content}"
+    return f"✅ Stored message for {user_id}: “{content}”"
 
 @tool
-async def search_memory(context: RunContextWrapper[Mem0Context], query: str) -> str:
+async def search_memory(
+    query: str,
+    config: RunnableConfig
+) -> str:
     """
-    Search for memories in Mem0
-    Args:
-        query: The search query.
+    Search Mem0 for memories matching the query.
     """
-    user_id = context.context.user_id or "default_user"
+    user_id = config["configurable"].get("user_id") or "default_user"
     memories = await client.search(query, user_id=user_id, output_format="v1.1")
-    results = '\n'.join([result["memory"] for result in memories["results"]])
-    return str(results)
+    results = [item["memory"] for item in memories.get("results", [])]
+    if not results:
+        return "No matching memories found."
+    return "\n".join(f"- {m}" for m in results)
 
 @tool
-async def get_all_memory(context: RunContextWrapper[Mem0Context]) -> str:
-    """Retrieve all memories from Mem0"""
-    user_id = context.context.user_id or "default_user"
+async def get_all_memory(
+    config: RunnableConfig
+) -> str:
+    """
+    Retrieve all stored memories for the current user.
+    """
+    user_id = config["configurable"].get("user_id") or "default_user"
     memories = await client.get_all(user_id=user_id, output_format="v1.1")
-    results = '\n'.join([result["memory"] for result in memories["results"]])
-    return str(results)
-
-# Example agent configuration and runtime loop are omitted here; integrate with your agent framework as needed.
-# This module now provides async memory tools for agentic use with Mem0.
-        
+    results = [item["memory"] for item in memories.get("results", [])]
+    if not results:
+        return "No memories stored yet."
+    return "\n".join(f"- {m}" for m in results)
