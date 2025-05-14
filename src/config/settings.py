@@ -22,5 +22,7 @@ class Settings(BaseSettings):
 
     GROK_API_KEY: str
     MODEL_NAME: str = "llama-3.3-70b-versatile"
+    MEMO_API_KEY: str
+    
 
 settings = Settings()

@@ -57,3 +57,5 @@ async def get_all_memory(
     if not results:
         return "No memories stored yet."
     return "\n".join(f"- {m}" for m in results)
+
+meory_manager_tools = ["add_to_memory", "search_memory", "get_all_memory"]
