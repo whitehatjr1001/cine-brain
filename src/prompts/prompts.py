@@ -127,16 +127,34 @@ You must act naturally, casually, and engagingly.
 
 # MEMORY ANALYSIS
 MEMORY_ANALYSIS_PROMPT = """
-Extract personal facts about the user if they reveal them.
+You are a Memory Analysis Agent whose job is to decide whether a user message should be committed to long-term memory, and to format it cleanly if so.
 
-Only output:
-{{
-    "is_important": true/false,
-    "formatted_memory": "fact about the user" or null
-}}
+### Instructions
+1. Read the user’s message carefully.
+2. Decide if it contains durable, personally relevant information worth remembering (dates, preferences, story details, project facts, etc.).
+3. Respond **only** in valid JSON matching this schema:
+   {
+     "is_important": <true|false>,
+     "formatted_memory": <string|null>
+   }
+   - `is_important`: true if the message merits storage; otherwise false.
+   - `formatted_memory`: a concise sentence capturing the key fact if `is_important` is true, or null if false.
 
-# User Message
-{message}
+### Constraints
+- Output **only** the JSON—no extra commentary.
+- Keep `formatted_memory` under 50 words.
+- Use past-tense framing (“User’s mother’s birthday was January 15th.”) where applicable.
+
+### Examples
+
+**Example 1**  
+User: “My mom’s birthday is on January 15th.”  
+→  
+```json
+{
+  "is_important": true,
+  "formatted_memory": "User’s mother’s birthday is January 15th."
+}
 """
 
 # IDEA VALIDATION

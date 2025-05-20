@@ -9,7 +9,7 @@ from langchain_groq import ChatGroq
 from src.config.logger import logger
 from src.config.settings import settings
 from src.memory.tools import add_to_memory, search_memory  # Tools must be LangChain @tool
-from src.memory.prompt_templates import MEMORY_ANALYSIS_PROMPT  # Your structured prompt
+from src.prompts.prompts import MEMORY_ANALYSIS_PROMPT  # Your structured prompt
 
 
 class MemoryAnalysis(BaseModel):
