@@ -1,19 +1,20 @@
-# imdb_api.py
-from bs4 import BeautifulSoup
 import requests
 import re
 from src.config import settings
 from langchain_core.tools import tool
-    
+from crawl4ai import AsyncCrawler
+from src.config.logger import logger
+
 class IMDbAPI:
     def __init__(self):
         self.api_key = settings.SERPER_API_KEY
         self.base_url = "https://google.serper.dev/search"
         
     @tool
-    async def search(self, query: str) -> str:
+    def search(self, query: str) -> str:
+        logger.info(f"Searching for {query}")
         payload = {
-            "q": query,
+            "q": "site:imdb.com " + query,
             "api_key": self.api_key
         }
         headers = {
@@ -25,19 +26,15 @@ class IMDbAPI:
     
     @tool
     async def get_movie_info(self, query: str) -> str:
+        logger.info(f"Getting movie info for {query}")
         urls =  await self.search(query)
+        crawler = AsyncCrawler()
         for url in urls["organic_results"]:
-            response = requests.get(url["link"])
-            soup = BeautifulSoup(response.text, 'html.parser')
-            text = soup.get_text()
-            return text
+            response = await crawler.get(url["link"])
+            return response.markdown
         
-    @tool
-    async def get_movie_info(self, query: str) -> str:
-        urls =  await self.search(query)
-        for url in urls["organic_results"]:
-            response = requests.get(url["link"])
-            soup = BeautifulSoup(response.text, 'html.parser')
-            text = soup.get_text()
-            return text
-        
+    tools = [   
+        self.get_movie_info,
+    ]
+
+imbdapi = IMDbAPI()

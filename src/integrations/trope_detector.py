@@ -1,1 +1,0 @@
-# trope_detector.py
