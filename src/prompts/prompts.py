@@ -169,3 +169,8 @@ Task:
 # Idea Description
 {idea_description}
 """
+def get_prompt_template(prompt_template: str) -> str:
+    return prompt_template.format(**state)
+  
+def apply_prompt_template(prompt_template: str, state: dict) -> str:
+    return prompt_template.format(**state)

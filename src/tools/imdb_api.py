@@ -10,8 +10,8 @@ class IMDbAPI:
         self.api_key = settings.SERPER_API_KEY
         self.base_url = "https://google.serper.dev/search"
         
-    @tool
-    def search(self, query: str) -> str:
+    
+    async def search(self, query: str) -> str:
         logger.info(f"Searching for {query}")
         payload = {
             "q": "site:imdb.com " + query,
@@ -34,7 +34,7 @@ class IMDbAPI:
             return response.markdown
         
     tools = [   
-        self.get_movie_info,
+        get_movie_info,
     ]
 
 imbdapi = IMDbAPI()

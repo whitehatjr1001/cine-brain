@@ -4,7 +4,7 @@ from typing import Optional
 from src.config.execeptions import TextToSpeechError
 from src.config.settings import settings
 from groq import Groq
-from groq import Audio
+
 
 class TextToSpeech:
     """A class to handle text-to-speech conversion using ElevenLabs."""

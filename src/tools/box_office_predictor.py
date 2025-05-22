@@ -21,20 +21,20 @@ class BoxOfficePredictor:
             'Content-Type': 'application/json'
         }
         
-    def predict(self):
+    async def predict(self):
         logger.info(f"Predicting box office for {self.payload}")
         response = requests.request("POST", self.base_url, headers=self.headers, data=self.payload)
         return response.json()
     
     @tool
     async def get_movie_info(self) -> str:
-        urls =  self.predict()
+        urls =  await self.predict()
         for url in urls["organic_results"]:
             response = await AsyncCrawler().get(url["link"])
             return response.markdown
         
     tools = [
-        self.get_movie_info,
+        get_movie_info,
     ]
 
 box_office_predictor = BoxOfficePredictor(query="Avatar")

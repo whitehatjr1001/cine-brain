@@ -1,10 +1,84 @@
 # nodes.py
 from src.state import CineBrainState
 from src.memory.memory_manager import MemoryManager
+from src.tools import add_to_memory, search_memory, text_speech, box_office_predictor, imdb_api
+from src.agents.agents import create_agent
+from langchain_core.runnables import RunnableConfig
+from langchain_core.messages import HumanMessage,AIMessage
+
+
+def router_node(state: CineBrainState, config: RunnableConfig):
+    """
+    Analyze the user's latest message and the conversation so far.
+    """
+    if not state["messages"]:
+        return {}
+
+    last_message = state["messages"][-1]
+
+    return {"message": last_message}
+
+def researcher_node(state: CineBrainState, config: RunnableConfig):
+    """
+    Analyze the user's latest message and the conversation so far.
+    """
+    if not state["messages"]:
+        return {}
+
+    last_message = state["messages"][-1]
+
+    return {"message": last_message}
+
+def writer_node(state: CineBrainState, config: RunnableConfig):
+    """
+    Analyze the user's latest message and the conversation so far.
+    """
+    if not state["messages"]:
+        return {}
+
+    last_message = state["messages"][-1]
+
+    return {"message": last_message}
+
+def dialogue_writer_node(state: CineBrainState, config: RunnableConfig):
+    """
+    Analyze the user's latest message and the conversation so far.
+    """
+    if not state["messages"]:
+        return {}
+
+    last_message = state["messages"][-1]
+
+    return {"message": last_message}
+
+def plot_consistency_node(state: CineBrainState, config: RunnableConfig):
+    """
+    Analyze the user's latest message and the conversation so far.
+    """
+    if not state["messages"]:
+        return {}
+
+    last_message = state["messages"][-1]
+
+    return {"message": last_message}
+
+
+def box_office_predictor_node(state: CineBrainState, config: RunnableConfig):
+    """
+    Analyze the user's latest message and the conversation so far.
+    """
+    if not state["messages"]:
+        return {}
+
+    last_message = state["messages"][-1]
+
+    return {"message": last_message}
+
 
 # ------------------------
 # MEMORY EXTRACTION NODE
 # ------------------------
+
 async def memory_extraction_node(state: CineBrainState):
     """
     Extract and store important information from the last human message
