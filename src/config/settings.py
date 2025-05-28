@@ -27,17 +27,6 @@ class Settings(BaseSettings):
     MEMO_API_KEY: str
     SERPER_API_KEY: str
     
-    LLMType = Literal["basic", "reasoning", "vision"]
-    AGENT_LLM_MAP: dict[str, LLMType] = {
-    "router_planner": "basic",
-    "researcher": "basic",
-    "writer": "basic",
-    "brainstormer": "basic",
-    "speaker": "basic",
-    "dialogue_writer": "basic",
-    "plot_consistency": "basic",
-    "box_office_predictor": "basic",
 
-}
 
 settings = Settings()
