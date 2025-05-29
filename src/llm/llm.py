@@ -7,7 +7,7 @@ import os
 
 from langchain_openai import ChatGroq
 
-from src.config import load_yaml_config
+from src.config.configuration import load_yaml_config
 from src.config.agents import LLMType
 
 # Cache for LLM instances
@@ -47,12 +47,12 @@ def _create_llm_use_conf(llm_type: LLMType, conf: Dict[str, Any]) -> ChatGroq:
     if not merged_conf:
         raise ValueError(f"Unknown LLM Conf: {llm_type}")
 
-    return (**merged_conf)
+    return ChatGroq(**merged_conf)
 
 
 def get_llm_by_type(
     llm_type: LLMType,
-) -> :
+) -> ChatGroq:
     """
     Get LLM instance by type. Returns cached instance if available.
     """

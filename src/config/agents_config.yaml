@@ -1,0 +1,26 @@
+#Basic model configuration
+BASIC_MODEL:
+  model: "llama3.2"
+  temperature: 0.2
+  base_url: "https://api.groq.com/v1"
+  api_key: "$GROQ_API_KEY"  # Read from environment for security
+  max_tokens: 6144
+  timeout: 30
+
+# You can keep the others for future use
+REASONING_MODEL:
+  model: "llama3.2"
+  temperature: 0.2
+  base_url: "https://api.groq.com/v1"
+  api_key: "$GROQ_API_KEY"
+  max_tokens: 2048
+  timeout: 30
+
+VISION_MODEL:
+  model: "llama3.2"
+  temperature: 0.2
+  base_url: "https://api.groq.com/v1"
+  api_key: "$GROQ_API_KEY"
+  max_tokens: 2048
+  timeout: 30
+
