@@ -1,4 +1,3 @@
-from langchain_core.tools import tool
 from crawl4ai import AsyncCrawler
 import requests
 from src.config import settings
@@ -23,7 +22,7 @@ def web_research(query: str) -> str:
         logger.error(f"Web search failed: {e}")
         return "Web search failed."
 
-@tool
+
 async def web_search(query: str,num_results: int = 5) -> str:
     """Search the web for information."""
     try:
