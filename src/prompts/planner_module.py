@@ -7,3 +7,9 @@ class PlannerResponse(BaseModel):
     memory: dict
     messages: list
 
+class VideoConfig(BaseModel):
+    aspect_ratio: str
+    number_of_videos: int
+    duration_seconds: int
+    negative_prompt: str
+    

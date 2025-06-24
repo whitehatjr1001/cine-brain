@@ -9,7 +9,7 @@ from langchain_groq import ChatGroq
 from src.config.logger import logger
 from src.config.settings import settings
 from src.memory.tools import add_to_memory, search_memory  # Tools must be LangChain @tool
-from src.prompts.prompts import MEMORY_ANALYSIS_PROMPT  # Your structured prompt
+from src.prompts.prompts import MEMORY_ANALYSIS_PROMPT ,get_prompt_template # Your structured prompt
 
 
 class MemoryAnalysis(BaseModel):
@@ -31,7 +31,7 @@ class MemoryManager:
 
     async def _analyze_memory(self, message: str) -> MemoryAnalysis:
         """Use the LLM to analyze whether a message is important and how to store it."""
-        prompt = MEMORY_ANALYSIS_PROMPT.format(message=message)
+        prompt = get_prompt_template("memory_analysis").format(message=message)
         return await self.llm.ainvoke(prompt)
 
     async def extract_and_store_memories(self, message: BaseMessage) -> None:
