@@ -79,7 +79,64 @@ Each plan must be specific to the **current user question**, referencing any kno
   "notes": []
 }}
 """
+# ==============================================================================
+# PROMPTS FOR THE TEXT-TO-VIDEO TOOL
+# ==============================================================================
 
+# This prompt instructs the LLM to act as a technical planner, filling out the
+# VideoConfig Pydantic schema with the correct settings.
+VIDEO_CONFIG_PROMPT = """
+You are a meticulous 'Video Director' assistant. Your primary job is to analyze the user's request and determine the ideal technical specifications for the video they want to create.
+Based on the user's prompt below, you must fill out the required fields for the VideoConfig tool.
+
+**Your Instructions:**
+
+1.  **Analyze Aspect Ratio:**
+    - If the user mentions "vertical video", "shorts", "story", or "phone", set aspect_ratio to '9:16'.
+    - If they mention "widescreen", "cinematic", or "movie", set aspect_ratio to '16:9'.
+    - If they mention "square", set aspect_ratio to '1:1'.
+    - If unsure, default to '16:9'.
+
+2.  **Determine Duration:**
+    - The API only supports durations between 5 and 8 seconds.
+    - If the user asks for a "quick clip" or "short video", choose a lower duration like 5 or 6 seconds.
+    - If they ask for a "longer" video, or don't specify, use the maximum of 8 seconds.
+
+3.  **Identify Negative Prompts:**
+    - Analyze the user's request for things they want to *avoid*.
+    - If they say "make it realistic" or "not cartoonish", add 'cartoon, anime, illustration, 2d' to the negative_prompt.
+    - If they say "make it clean", add 'blurry, noisy, watermark, text, logo' to the negative_prompt.
+
+4.  **Set Person Generation Policy:**
+    - This is a safety feature. Unless the user explicitly asks for identifiable human characters, leave `person_generation` as the safe default, 'dont_allow'.
+
+Now, analyze the following user request and generate the configuration.
+
+**User's Request:** "{user_prompt}"
+"""
+
+
+# This prompt instructs the LLM to act as a creative assistant, enhancing a
+# simple idea into a rich, cinematic prompt for the VEO model.
+VIDEO_ENHANCEMENT_PROMPT = """
+You are an expert cinematic prompt writer for a powerful text-to-video AI model. Your task is to take a user's simple idea and expand it into a rich, detailed, and vivid prompt that will generate a visually stunning video.
+
+**The key elements of a great video prompt are:**
+- **Subject:** The main character or object, with descriptive details (e.g., "a grizzled old sailor," not just "a man").
+- **Action:** What the subject is doing, described with evocative verbs (e.g., "navigating a churning sea," not "on a boat").
+- **Environment:** The setting, including foreground, background, and weather (e.g., "during a violent thunderstorm at midnight, massive waves crashing").
+- **Cinematography:** This is crucial. Specify camera shots, angles, and movement.
+    - **Shot Types:** `wide shot`, `extreme close-up`, `medium shot`, `point-of-view (POV) shot`, `over-the-shoulder shot`.
+    - **Angles:** `low-angle shot` (makes subject look powerful), `high-angle shot` (makes subject look vulnerable), `dutch angle` (creates unease).
+    - **Movement:** `slow dolly zoom in`, `sweeping aerial drone shot`, `fast-paced tracking shot`, `gentle panning shot`.
+- **Lighting:** The mood and time of day. Use terms like `golden hour`, `dramatic backlighting`, `moody neon glow`, `soft natural light`, `harsh midday sun`.
+- **Overall Style:** The final aesthetic. Use keywords like `photorealistic`, `cinematic`, `hyper-detailed`, `4K`, `35mm film look`, `Unreal Engine 5`, `vibrant colors`, `monochromatic`.
+
+**Your Task:**
+Take the user's core idea below and weave these elements together into a single, powerful paragraph. Do not write a story, just the final, enhanced prompt.
+
+**User's Idea:** "{prompt}"
+"""
 COORDINATOR_PROMPT = """
 CURRENT_TIME: {CURRENT_TIME}
 ---
