@@ -1,7 +1,3 @@
-class SpeechToTextError(Exception):
-    """Custom exception for Speech-to-text conversion errors."""
-
-    pass
 
 
 class TextToSpeechError(Exception):
@@ -9,14 +5,12 @@ class TextToSpeechError(Exception):
 
     pass
 
-
-class TextToImageError(Exception):
-    """Custom exception for Text-to-image generation errors."""
+class AgentExecutionError(Exception):
+    """Custom exception for agent execution errors."""
 
     pass
 
-
-class ImageToTextError(Exception):
-    """Custom exception for Image-to-text conversion errors."""
+class VideoProcessingError(Exception):
+    """Custom exception for video processing errors."""
 
     pass

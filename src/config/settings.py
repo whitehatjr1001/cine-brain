@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     TTS_MODEL_NAME: str = "playai-tts"
     MEMO_API_KEY: str
     SERPER_API_KEY: str
+    GEMINI_API_KEY: str
     
 
 
