@@ -12,3 +12,5 @@ cine-brain
 tests/
 bash.exe.stackdump
 .env
+.env.example
+
