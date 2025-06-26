@@ -21,8 +21,6 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    GROK_API_KEY: str
-    MODEL_NAME: str = "llama-3.3-70b-versatile"
     TTS_MODEL_NAME: str = "playai-tts"
     MEMO_API_KEY: str
     SERPER_API_KEY: str

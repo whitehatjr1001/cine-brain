@@ -6,7 +6,7 @@ import os
 from langchain_openai import ChatGroq
 
 from src.config.configuration import load_yaml_config
-from src.config.agents import LLMType
+from src.config.agents_config import LLMType
 
 # Cache for LLM instances
 _llm_cache: dict[LLMType, ChatGroq] = {}

@@ -8,7 +8,7 @@ from src.config.settings import settings
 from langgraph.graph import Command 
 
 
-def memory_node(state: CineBrainState) -> Command:
+def memmory_extraction_node(state: CineBrainState) -> Command:
     llm = get_llm_by_type("basic")
     
     prompt = apply_prompt_template(state.messages)
