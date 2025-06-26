@@ -11,3 +11,4 @@ wheels/
 cine-brain
 tests/
 bash.exe.stackdump
+.env
