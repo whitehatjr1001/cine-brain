@@ -1,8 +1,6 @@
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Literal
 from dotenv import load_dotenv
-import os
 
 # Find project root
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
