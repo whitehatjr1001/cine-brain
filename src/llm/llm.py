@@ -5,7 +5,7 @@ import os
 from langchain_groq import ChatGroq
 
 from src.config.configuration import load_yaml_config, LLMType
-
+from src.config.logger import logger
 # Cache for LLM instances
 _llm_cache: dict[LLMType, ChatGroq] = {}
 
@@ -22,6 +22,7 @@ def _get_env_llm_conf(llm_type: str) -> Dict[str, Any]:
         if key.startswith(prefix):
             conf_key = key[len(prefix) :].lower()
             conf[conf_key] = value
+    logger.system_info(f"Environment LLM conf: {conf}")
     return conf
 
 
@@ -42,6 +43,8 @@ def _create_llm_use_conf(llm_type: LLMType, conf: Dict[str, Any]) -> ChatGroq:
 
     if not merged_conf:
         raise ValueError(f"Unknown LLM Conf: {llm_type}")
+    
+    logger.system_info(f"Creating LLM with conf: {merged_conf}")
 
     return ChatGroq(**merged_conf)
 

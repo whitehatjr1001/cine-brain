@@ -100,9 +100,11 @@ class CineBrainLogger:
         self._log(logging.WARNING, f"⚠️ {message}", LogCategory.WARNING, context, **kwargs)
 
     def debug(self, message: str, context: Optional[Dict[str, Any]] = None, **kwargs) -> None:
+        context["debug"] = True
         self._log(logging.DEBUG, message, LogCategory.DEBUG, context, **kwargs)
 
     def critical(self, message: str, context: Optional[Dict[str, Any]] = None, **kwargs) -> None:
+        context["critical"] = True
         self._log(logging.CRITICAL, f"🚨 {message}", LogCategory.CRITICAL, context, **kwargs)
 
     def exception(self, message: str, context: Optional[Dict[str, Any]] = None) -> None:

@@ -1,7 +1,6 @@
 import os
 import yaml
 from typing import Dict, Any, Literal
-from langchain_groq import ChatGroq
 from pathlib import Path
 from langchain_core.runnables import RunnableConfig
 
@@ -13,18 +12,11 @@ def get_config_path(relative_path: str = "agents_config.yaml") -> str:
 
 # ------------- 1. LLM Type Definitions -------------
 
-LLMType = Literal["basic", "reasoning", "vision"]
+LLMType = Literal["basic", "tools", "prompt"]
 
-# ------------- 2. Agent to LLM Type Mapping -------------
+# ------------- 2. Node to LLM Type Mapping -------------
 
-AGENT_LLM_MAP: dict[str, LLMType] = {
-    "coordinator": "basic",
-    "planner": "basic",
-    "researcher": "basic",
-    "resolver": "basic",      # renamed for clarity
-    "reporter": "basic",
-    # Extend as needed for other agent roles...
-}
+# (Node-to-LLM mapping removed as it's no longer needed)
 
 # ------------- 3. Config Loader (with env support) -------------
 
