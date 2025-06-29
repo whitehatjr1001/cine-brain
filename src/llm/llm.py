@@ -1,12 +1,10 @@
-
 from pathlib import Path
 from typing import Any, Dict
 import os
 
-from langchain_openai import ChatGroq
+from langchain_groq import ChatGroq
 
-from src.config.configuration import load_yaml_config
-from src.config.agents_config import LLMType
+from src.config.configuration import load_yaml_config, LLMType
 
 # Cache for LLM instances
 _llm_cache: dict[LLMType, ChatGroq] = {}
@@ -57,9 +55,8 @@ def get_llm_by_type(
     if llm_type in _llm_cache:
         return _llm_cache[llm_type]
 
-    conf = load_yaml_config(
-        str((Path(__file__).parent.parent.parent / "conf.yaml").resolve())
-    )
+    config_path = Path(__file__).parent.parent / "config" / "agents_config.yaml"
+    conf = load_yaml_config(str(config_path.resolve()))
     llm = _create_llm_use_conf(llm_type, conf)
     _llm_cache[llm_type] = llm
     return llm

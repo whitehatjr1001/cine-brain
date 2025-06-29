@@ -1,8 +1,7 @@
 #Basic model configuration
 BASIC_MODEL:
-  model: "llama3.2"
+  model: "llama-3.3-70b-versatile"
   temperature: 0.2
-  base_url: "https://api.groq.com/v1"
   api_key: "$GROQ_API_KEY"  # Read from environment for security
   max_tokens: 6144
 
@@ -11,14 +10,14 @@ BASIC_MODEL:
 TOOLS_MODEL:
   model: "llama3.2"
   temperature: 0.2
-  base_url: "https://api.groq.com/v1"
+  base_url: "https://api.groq.com/openai/v1"
   api_key: "$GROQ_API_KEY"
   max_tokens: 2048
 
 PROMPT_MODEL:
   model: "llama3.2"
   temperature: 0.2
-  base_url: "https://api.groq.com/v1"
+  base_url: "https://api.groq.com/openai/v1"
   api_key: "$GROQ_API_KEY"
   max_tokens: 2048
 
