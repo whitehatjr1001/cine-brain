@@ -9,10 +9,10 @@ from typing import Any, List, Dict
 MEMORY_EXTRACTION_PROMPT = """
 You are the Memory Specialist. Your task is to analyze the user's query and determine if it requires access to long-term memory or project context. 
 
-- User Query: "{messages[-1].content}"
-- Conversation History: {messages}
+- User Query: "{user_query}"
 
-Review the query and conversation history. 
+
+Review the query. 
 - If the query is a follow-up, references a previous topic, or implies prior context, extract a concise summary of the relevant information.
 - If the query is self-contained or starts a new topic, respond with only the string: "No memory needed."
 

@@ -24,8 +24,9 @@ def box_office_predictor(query: str,num_results: int = 5) -> str:
     
     crawler = AsyncCrawler()
     results = []
+    logger.agent_event(f"Serching the web for: {query}")
     for url in urls["organic_results"][:num_results]:
         response = crawler.get(url["link"])
         results.append(response.markdown)
-    
+    logger.agent_event(f"Found {len(results)} results for: {query}")
     return "\n".join(results)

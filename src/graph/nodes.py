@@ -1,70 +1,102 @@
-from src.graph.state import CineBrainState
-from src.prompts.prompts import apply_prompt_template
-from src.prompts.planner_module import PlannerResponse,MemoryAnalysis
-from src.llm.llm import get_llm_by_type
-from langchain_core.messages import HumanMessage,AIMessage
+from typing import Literal
+from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
-from src.config.settings import settings
-from langgraph.graph import Command 
+from langgraph.types import Command
+from src.llm.llm import get_llm_by_type
+from src.config.logger import logger
+from src.prompts.prompts import apply_prompt_template
+from src.memory.memory_manager import MemoryManager
+from src.graph.state import CineBrainState as State
 
 
-def memmory_extraction_node(state: CineBrainState) -> Command:
+# --- Node: Memory Extraction ---
+def memory_extraction_node(state: State) -> Command[Literal["router"]]:
+    """Extract and store important information from the last message, update memory_context, and route to router."""
+    logger.system_info("Running memory_extraction_node")
+    if not state["messages"]:
+        logger.system_info("No messages in state; skipping memory extraction.")
+        return Command(goto="router")
+
+    memory_manager = MemoryManager()
+    last_message = state["messages"][-1]
+    try:
+        analysis = memory_manager.analyze_memory(last_message.content)
+        if analysis and analysis.is_important and analysis.formatted_memory and analysis.formatted_memory.lower() != "no memory needed.":
+            # Store memory and update context
+            memory_manager.extract_and_store_memories(last_message)
+            logger.system_info(f"Memory extracted and stored: {analysis.formatted_memory}")
+            return Command(update={"memory_context": analysis.formatted_memory}, goto="router")
+        else:
+            # No memory needed or not important
+            logger.system_info("No important memory extracted.")
+            return Command(update={"memory_context": ""}, goto="router")
+    except Exception as e:
+        logger.workflow_error(f"Error during memory extraction: {e}")
+        return Command(update={"memory_context": ""}, goto="router")
+
+# --- Node: Router ---
+def router_node(state: State) -> Command[Literal["conversation", "video", "audio"]]:
+    """Route to the appropriate workflow based on user input or state."""
+    logger.system_info("Running router_node")
+    # Example: simple routing logic (customize as needed)
+    workflow = state.get("workflow", "conversation")
+    return Command(goto=workflow)
+
+# --- Node: Context Injection ---
+def context_injection_node(state: State) -> dict:
+    """Inject relevant context (e.g., activity, memory) into the state."""
+    logger.system_info("Running context_injection_node")
+    # Example: inject current activity (stub)
+    current_activity = "writing"  # Replace with real context logic
+    return {"current_activity": current_activity}
+
+# --- Node: Conversation ---
+def conversation_node(state: State, config: RunnableConfig) -> Command[Literal["summary"]]:
+    """Handle conversation and generate AI response."""
+    logger.system_info("Running conversation_node")
     llm = get_llm_by_type("basic")
-    
-    prompt = apply_prompt_template(state.messages)
-    messages = state.messages[:-1]
-    messages.append(HumanMessage(content=prompt))
-    response = llm.with_structured_output(MemoryAnalysis).invoke(messages)
-    state.messages.append(AIMessage(content=response))
-    if response.is_important and response.formatted_memory:
-        memory_manager = MemoryManager(user_id=settings.USER_ID)
-        memories = memory_manager.extract_and_store_memories(response.formatted_memory)
-        state.memory_context.append(memories)
-    
-    return Command(state)
+    prompt = apply_prompt_template(state["messages"])
+    response = llm.invoke([HumanMessage(content=prompt)])
+    state["messages"].append(AIMessage(content=response.content))
+    return Command(update={"messages": state["messages"]}, goto="summary")
 
-def planner_node(state: CineBrainState) -> Command:
-    llm = get_llm_by_type("basic")
-    
-    prompt = apply_prompt_template(state.messages)
-    messages = state.messages[:-1]
-    messages.append(HumanMessage(content=prompt))
-    response = llm.with_structured_output(PlannerResponse).invoke(messages)
-    state.messages.append(AIMessage(content=response))
-    if response.has_enough_context:
-        state.plan = response.steps
-    else:
-        state.plan = []    
-    return Command(state)
+# --- Node: Video ---
+def video_node(state: State, config: RunnableConfig) -> Command[Literal["summary"]]:
+    """Handle video generation or processing."""
+    logger.system_info("Running video_node")
+    llm = get_llm_by_type("tools")
+    prompt = apply_prompt_template(state["messages"])
+    response = llm.invoke([HumanMessage(content=prompt)])
+    # Stub: video_path logic
+    video_path = "generated_video.mp4"
+    return Command(update={"video_path": video_path}, goto="summary")
 
-        
-def conversation_node(state: CineBrainState) -> Command:
-    llm = get_llm_by_type("basic")
-    
-    prompt = apply_prompt_template(state.messages)
-    messages = state.messages[:-1]
-    messages.append(HumanMessage(content=prompt))
+# --- Node: Audio ---
+def audio_node(state: State, config: RunnableConfig) -> Command[Literal["summary"]]:
+    """Handle audio generation or processing."""
+    logger.system_info("Running audio_node")
+    llm = get_llm_by_type("tools")
+    prompt = apply_prompt_template(state["messages"])
+    response = llm.invoke([HumanMessage(content=prompt)])
+    # Stub: audio_path logic
+    audio_path = "generated_audio.mp3"
+    return Command(update={"audio_path": audio_path}, goto="summary")
+
+# --- Node: Summary ---
+def summary_node(state: State, config: RunnableConfig) -> Command[Literal["store_memory"]]:
+    """Summarize the conversation so far."""
+    logger.system_info("Running summary_node")
+    llm = get_llm_by_type("prompt")
+    prompt = "Summarize the conversation so far."
+    messages = state["messages"] + [HumanMessage(content=prompt)]
     response = llm.invoke(messages)
-    state.messages.append(AIMessage(content=response))
-    return Command(state)
+    return Command(update={"summary": response.content}, goto="store_memory")
 
-def audio_node(state: CineBrainState) -> Command:
-    llm = get_llm_by_type("basic")
-    
-    prompt = apply_prompt_template(state.messages)
-    messages = state.messages[:-1]
-    messages.append(HumanMessage(content=prompt))
-    response = llm.invoke(messages)
-    state.messages.append(AIMessage(content=response))
-    return Command(state)
-
-def video_node(state: CineBrainState) -> Command:
-    llm = get_llm_by_type("basic")
-    
-    prompt = apply_prompt_template(state.messages)
-    messages = state.messages[:-1]
-    messages.append(HumanMessage(content=prompt))
-    response = llm.invoke(messages)
-    state.messages.append(AIMessage(content=response))
-    return Command(state)
-
+# --- Node: Store Memory ---
+def store_memory_node(state: State) -> Command[Literal["router"]]:
+    """Store the summary or important information in memory."""
+    logger.system_info("Running store_memory_node")
+    # Stub: store summary in memory (customize as needed)
+    summary = state.get("summary", "")
+    logger.info(f"Storing summary: {summary}")
+    return Command(goto="router")
