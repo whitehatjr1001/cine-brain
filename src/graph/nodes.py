@@ -11,7 +11,7 @@ from src.graph.state import CineBrainState as State
 
 # --- Node: Memory Extraction ---
 def memory_extraction_node(state: State) -> Command[Literal["router"]]:
-    """Extract and store important information from the last message, update memory_context, and route to router."""
+    """Extract relevant memory context from the last message and route to router."""
     logger.system_info("Running memory_extraction_node")
     if not state["messages"]:
         logger.system_info("No messages in state; skipping memory extraction.")
@@ -20,16 +20,12 @@ def memory_extraction_node(state: State) -> Command[Literal["router"]]:
     memory_manager = MemoryManager()
     last_message = state["messages"][-1]
     try:
-        analysis = memory_manager.analyze_memory(last_message.content)
-        if analysis and analysis.is_important and analysis.formatted_memory and analysis.formatted_memory.lower() != "no memory needed.":
-            # Store memory and update context
-            memory_manager.extract_and_store_memories(last_message)
-            logger.system_info(f"Memory extracted and stored: {analysis.formatted_memory}")
-            return Command(update={"memory_context": analysis.formatted_memory}, goto="router")
+        memory_context = memory_manager.extract_memory(last_message.content)
+        if memory_context:
+            logger.system_info(f"Memory context found: {memory_context}")
         else:
-            # No memory needed or not important
-            logger.system_info("No important memory extracted.")
-            return Command(update={"memory_context": ""}, goto="router")
+            logger.system_info("No relevant memory context found.")
+        return Command(update={"memory_context": memory_context}, goto="router")
     except Exception as e:
         logger.workflow_error(f"Error during memory extraction: {e}")
         return Command(update={"memory_context": ""}, goto="router")
