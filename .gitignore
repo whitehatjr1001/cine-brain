@@ -13,4 +13,5 @@ tests/
 bash.exe.stackdump
 .env
 .env.example
+planing.md
 

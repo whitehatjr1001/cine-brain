@@ -5,38 +5,42 @@ from langgraph.types import Command
 from src.llm.llm import get_llm_by_type
 from src.config.logger import logger
 from src.prompts.prompts import apply_prompt_template
-from src.memory.memory_manager import MemoryManager
+from src.prompts.planner_module import RouterResponse
+from src.memory.memory_manager import  get_memory_manager
 from src.graph.state import CineBrainState as State
+from src.agents.agents import create_agent
+from src.tools.tools import get_tools
 
 
 # --- Node: Memory Extraction ---
-def memory_extraction_node(state: State) -> Command[Literal["router"]]:
+async def memory_extraction_node(state: State) -> Command[Literal["router","_end_"]]:
     """Extract relevant memory context from the last message and route to router."""
     logger.system_info("Running memory_extraction_node")
     if not state["messages"]:
-        logger.system_info("No messages in state; skipping memory extraction.")
+        return Command(goto="_end_")
+    memory_manager = await get_memory_manager()
+    memories = await memory_manager.extract_memory(state["messages"][-1].content)
+    if memories:
+        memory_context = memory_manager.format_memories_for_prompt(memories)
+        return Command(update={"memory_context": memory_context}, goto="router")
+    else:
         return Command(goto="router")
 
-    memory_manager = MemoryManager()
-    last_message = state["messages"][-1]
-    try:
-        memory_context = memory_manager.extract_memory(last_message.content)
-        if memory_context:
-            logger.system_info(f"Memory context found: {memory_context}")
-        else:
-            logger.system_info("No relevant memory context found.")
-        return Command(update={"memory_context": memory_context}, goto="router")
-    except Exception as e:
-        logger.workflow_error(f"Error during memory extraction: {e}")
-        return Command(update={"memory_context": ""}, goto="router")
-
 # --- Node: Router ---
-def router_node(state: State) -> Command[Literal["conversation", "video", "audio"]]:
+def router_node(state: State) -> Command[Literal["conversation", "video", "audio", "_end_"]]:
     """Route to the appropriate workflow based on user input or state."""
     logger.system_info("Running router_node")
-    # Example: simple routing logic (customize as needed)
-    workflow = state.get("workflow", "conversation")
-    return Command(goto=workflow)
+    llm = get_llm_by_type("basic").with_structured_output(RouterResponse)
+    prompt = apply_prompt_template("ROUTER_PROMPT", state["messages"])
+    response = llm.invoke([HumanMessage(content=prompt)])
+    if response.conversation:
+        return Command(goto="conversation")
+    elif response.video:
+        return Command(goto="video")
+    elif response.audio:
+        return Command(goto="audio")
+    else:
+        return Command(goto="_end_")
 
 # --- Node: Context Injection ---
 def context_injection_node(state: State) -> dict:

@@ -7,16 +7,21 @@ from typing import Any, List, Dict
 
 # 1. Memory Extraction Node
 MEMORY_EXTRACTION_PROMPT = """
-You are the Memory Specialist. Your task is to analyze the user's query and determine if it requires access to long-term memory or project context. 
+You are the Memory Specialist. Your task is to analyze the user's query and determine if it requires access to long-term memory or project context.
 
 - User Query: "{user_query}"
 
+Based on the user's query, decide whether long-term memory is relevant.
 
-Review the query. 
-- If the query is a follow-up, references a previous topic, or implies prior context, extract a concise summary of the relevant information.
-- If the query is self-contained or starts a new topic, respond with only the string: "No memory needed."
+If the query is a follow-up, references a previous topic, or implies prior context, set `is_important` to `true` and provide a concise summary or key phrase for memory search in `formatted_memory`. **Ensure `formatted_memory` is a non-empty string if `is_important` is `true`.**
 
-Your output must be either the memory summary or the specific string "No memory needed.". Do not add any other commentary.
+If the query is self-contained, starts a new topic, or doesn't require memory access, set `is_important` to `false` and `formatted_memory` to `null`.
+
+Your output MUST be a JSON object with the following schema:
+{{
+  "is_important": boolean,
+  "formatted_memory": string | null
+}}
 """
 
 # 2. Router Node
