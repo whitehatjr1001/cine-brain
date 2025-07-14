@@ -29,6 +29,7 @@ ROUTER_PROMPT = """
 You are the Workflow Router. Your job is to classify the user's query into the correct workflow.
 
 - User Query: "{messages[-1].content}"
+- Memory Context: {memory_context}
 
 Analyze the user's intent and choose one of the following workflows:
 - `conversation`: For general chat, questions, or text-based creative tasks.
@@ -102,6 +103,89 @@ Based on the query and response, create a neutral, third-person summary of the e
 Example: "The user asked for a video of a dragon, and the AI generated a cinematic prompt for it."
 """
 
+# 6. Complexity Assessment Prompt
+COMPLEXITY_ASSESSMENT_PROMPT = """
+You are a query complexity assessor. Your task is to determine if a user's query is simple enough for a direct LLM response or if it requires a more complex agent (like a ReAct agent) that can utilize tools.
+
+Consider a query complex if it:
+- Requires external information (e.g., current events, specific data not in your training data).
+- Involves multiple steps or sub-tasks.
+- Demands logical reasoning or problem-solving beyond simple factual recall.
+- Implies the use of tools (e.g., search, calculator, API calls).
+
+Consider a query simple if it:
+- Is a direct question answerable from general knowledge.
+- Is a conversational utterance (greetings, small talk).
+- Requires simple text generation or rephrasing.
+
+User Query: "{user_query}"
+
+Based on the analysis, provide a JSON object with the following schema:
+{{
+  "is_complex": boolean,
+  "reason": string
+}}
+"""
+
+# 7. Agent Summary Prompt
+AGENT_SUMMARY_PROMPT = """
+You are a concise summarizer. Your task is to take a detailed agent response and condense it into a brief, human-readable summary that can be presented to the user.
+
+Agent Response: "{agent_response}"
+
+Provide a summary that captures the main point or outcome of the agent's actions. If the agent's response is already concise, return it as is.
+"""
+
+# 8. Context Injection for Generation Prompt
+CONTEXT_INJECTION_GENERATION_PROMPT = """
+You are the Generation Context Creator. Your role is to analyze the user's query and any relevant memory to formulate precise instructions for video or audio generation.
+
+User Query: "{user_query}"
+Memory Context: "{memory_context}"
+Selected Workflow: {workflow}
+
+Based on the `Selected Workflow` and the provided context, generate a JSON object with the following structure:
+
+If `Selected Workflow` is 'video', provide:
+{{
+  "video_prompt": "Your detailed video generation prompt here",
+  "negative_prompt": "Optional negative prompt here (e.g., 'blurry, low quality')"
+}}
+
+If `Selected Workflow` is 'audio', provide:
+{{
+  "audio_dialogue": "The exact dialogue or sound description for audio generation"
+}}
+
+If `Selected Workflow` is 'conversation' or other, provide:
+{{
+  "general_instruction": "A clear, actionable instruction for the next LLM or agent"
+}}
+
+Ensure your prompts are highly descriptive, including visual or auditory details, styles, and any other relevant parameters. If no specific video/audio prompt or general instruction can be derived, provide an empty string for that field, but the overall structure must be maintained. DO NOT include any additional text outside the JSON.
+"""
+
+# 9. Memory Storage Decision Prompt
+MEMORY_STORAGE_DECISION_PROMPT = """
+You are the Memory Decision Maker. Your task is to analyze the conversation summary and determine if it contains important information that should be stored in long-term memory for future reference.
+
+Conversation Summary: "{summary}"
+
+Consider the summary important if it contains:
+- Key user preferences or facts about the user.
+- Important decisions or outcomes from the interaction.
+- Information that could significantly influence future interactions.
+- Details about generated media (e.g., video path, audio path).
+
+If the summary should be stored, set `should_store` to `true` and provide a brief `reason`. Otherwise, set `should_store` to `false` and provide a `reason`.
+
+Your output MUST be a JSON object with the following schema:
+{{
+  "should_store": boolean,
+  "reason": string
+}}
+"""
+
 # ==============================================================================
 # --- PROMPT REGISTRY & LOADER ---                                           #
 # ==============================================================================
@@ -117,6 +201,10 @@ PROMPT_REGISTRY: Dict[str, str] = {
     "conversation": TASK_EXECUTION_CONVERSATION_PROMPT,
     "video": TASK_EXECUTION_VIDEO_PROMPT,
     "audio": TASK_EXECUTION_AUDIO_PROMPT,
+    "complexity_assessment": COMPLEXITY_ASSESSMENT_PROMPT,
+    "agent_summary": AGENT_SUMMARY_PROMPT,
+    "context_injection_generation": CONTEXT_INJECTION_GENERATION_PROMPT,
+    "memory_storage_decision": MEMORY_STORAGE_DECISION_PROMPT,
 }
 
 def get_prompt_template(prompt_name: str) -> str:

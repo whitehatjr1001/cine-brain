@@ -1,7 +1,8 @@
 from langgraph.prebuilt import create_react_agent
 
-from src.prompts import apply_prompt_template
 from src.llm.llm import get_llm_by_type
+from langchain_core.messages import BaseMessage
+from src.prompts.prompts import apply_prompt_template
 
 
 # Create agents using configured LLM types
