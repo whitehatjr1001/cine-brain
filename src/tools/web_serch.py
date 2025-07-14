@@ -2,7 +2,7 @@ from crawl4ai import AsyncCrawler
 import requests
 from src.config import settings
 from src.config.logger import logger
-import asyncio
+
 def web_research(query: str) -> str:
     """Search the web for information."""
     try:
@@ -22,7 +22,8 @@ def web_research(query: str) -> str:
         logger.error(f"Web search failed: {e}")
         return "Web search failed."
 
-
+from langchain_core.tools import tool
+@tool
 async def web_search(query: str,num_results: int = 5) -> str:
     """Search the web for information."""
     try:

@@ -19,7 +19,7 @@ def imdb_api(query: str,num_results: int = 5) -> str:
         'Content-Type': 'application/json'
     }
     response = requests.request("POST", base_url, headers=headers, data=payload)
-    logger.info(f"Serching the web for: {query}")
+    logger.agent_event(f"Serching the web for: {query}")
     urls = response.json()
     
     crawler = AsyncCrawler()

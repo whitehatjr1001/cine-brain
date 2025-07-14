@@ -9,7 +9,7 @@ from src.prompts.planner_module import RouterResponse, ComplexityAnalysis, Conte
 from src.memory.memory_manager import  get_memory_manager
 from src.graph.state import CineBrainState as State
 from src.agents.agents import create_agent
-from src.tools.tools import get_tools
+from src.tools.web_tools import get_tools
 from src.tools.text_video import generate_video
 from src.tools.text_speech import generate_speech
 
