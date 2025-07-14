@@ -5,6 +5,7 @@ from langchain_core.tools import tool
 from crawl4ai import AsyncCrawler
 from src.config.logger import logger
 
+
 @tool
 def imdb_api(query: str,num_results: int = 5) -> str:
     api_key = settings.SERPER_API_KEY
